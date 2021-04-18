@@ -4,8 +4,8 @@ nordStatusCommand = 'date';
 function parseStatusString(statusString) {
     
     function parseIsConnected(statusString) {
-        let status = statusString.match(/Status: (\w+)/)[1];
-        return (status === "Connected")
+        let status = statusString.match(/Status: (\w+)/);
+        return (status !== null) && (status[1] === "Connected")
     }
 
     function parseServer(statusString) {
