@@ -38,7 +38,7 @@ plasmoidviewer -a ./plasmoid
 
 ## Unit tests
 
-Change directory to the root directory and run to following command
+Change directory to the root directory and run the following:
 ```
 qmltestrunner
 ```
