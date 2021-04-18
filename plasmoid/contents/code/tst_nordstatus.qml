@@ -11,6 +11,11 @@ TestCase {
      Constants for use in test
      */
     
+    function i18n(input) {
+        /* Override the built in translation to leave all results untranslated for the purposes of unit testing */
+        return input
+    }
+    
     readonly property string connectedResponse: "Status: Connected
 Current server: aa123.example.com
 Country: Nation Land
@@ -37,7 +42,7 @@ Uptime: 43 minutes 21 seconds
     
     readonly property string noInternetResponse: "Please check your internet connection and try again."
     
-    readonly property var expectedConnectedObj: ({
+    readonly property var connectedObj: ({
             connected: true,
             server: "aa123.example.com",
             country: "Nation Land",
@@ -47,7 +52,7 @@ Uptime: 43 minutes 21 seconds
             protocol: "UDP"
         });
     
-    readonly property var expectedDisconnectedObj: ({
+    readonly property var disconnectedObj: ({
             connected: false,
             server: "",
             country: "",
@@ -61,35 +66,60 @@ Uptime: 43 minutes 21 seconds
      Test Cases
      */
     
-    function init_data() {
+    function test_parseResponse_data() {
         return [
             {
                 tag: "connected", 
-                response: connectedResponse,
-                expected: expectedConnectedObj
+                input: connectedResponse,
+                expected: connectedObj
             },
             {
                 tag: "connected and needs update", 
-                response: connectedNeedUpdateResponse,
-                expected: expectedConnectedObj
+                input: connectedNeedUpdateResponse,
+                expected: connectedObj
             },
             {
                 tag: "disconnected", 
-                response: disconnectedResponse,
-                expected: expectedDisconnectedObj
+                input: disconnectedResponse,
+                expected: disconnectedObj
             },
             {
                 tag: "no internet", 
-                response: noInternetResponse,
-                expected: expectedDisconnectedObj
-            },
+                input: noInternetResponse,
+                expected: disconnectedObj
+            }
         ]
     }
     
     function test_parseResponse(data) {        
-        let actual = Logic.parseStatusString(data.response);
+        let actual = Logic.parseStatusString(data.input);
         let expected = data.expected;
         compare(actual, expected, data.tag)
     }
-        
+    
+    
+    function test_getConnectionShortSummary_data() {
+        return [
+            {
+                tag: "connected",
+                input: connectedObj,
+                expected: "Connected
+Country: Nation Land
+Server: aa123.example.com
+Your IP: 123.45.67.89"
+            },
+            {
+                tag: "not connected",
+                input: disconnectedObj,
+                expected: "Not connected"
+            }
+        ]
+    }
+    
+    function test_getConnectionShortSummary(data) {
+        let actual = Logic.getConnectionShortSummary(data.input);
+        let expected = data.expected;
+        compare(actual, expected, data.tag)
+    }
+    
 } 

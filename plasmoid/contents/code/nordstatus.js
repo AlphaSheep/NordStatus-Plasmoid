@@ -1,5 +1,5 @@
 
-nordStatusCommand = 'date';
+var nordStatusCommand = 'nordvpn status';
 
 function parseStatusString(statusString) {
     
@@ -51,3 +51,19 @@ function parseStatusString(statusString) {
     
 }
 
+
+function getConnectionShortSummary(conn) {
+    if (conn.connected) {
+        let result = [
+            i18n("Connected"), "\n", 
+            i18n("Country: "), conn.country, "\n",
+            i18n("Server: "), conn.server, "\n",
+            i18n("Your IP: "), conn.ip];
+ 
+        return result.join('');
+        
+    }
+    else {
+        return i18n("Not connected");
+    }
+}
