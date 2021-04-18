@@ -1,0 +1,17 @@
+[Desktop Entry]
+Name=NordVPN Status Widget
+Comment=Display the status of VPN connection in system tray
+
+Type=Service
+Icon=./content/icons/nordvpn.svg
+X-KDE-ServiceTypes=Plasma/Applet
+
+X-Plasma-API=declarativeappletscript
+X-Plasma-MainScript=ui/main.qml
+
+X-KDE-PluginInfo-Author=AlphaSheep
+X-KDE-PluginInfo-Email=brendan@alphasheep.co.za
+X-KDE-PluginInfo-Name=com.sylvermyst.plasmoid.nordstatus
+X-KDE-PluginInfo-Version=1
+X-KDE-PluginInfo-Website=https://github.com/AlphaSheep/plasmoid-nordvpn
+X-KDE-PluginInfo-Category=System Information
