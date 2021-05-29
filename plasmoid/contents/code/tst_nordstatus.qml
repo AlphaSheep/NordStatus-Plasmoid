@@ -38,12 +38,33 @@ Transfer: 1.23 MiB received, 456.78 KiB sent
 Uptime: 43 minutes 21 seconds
 "
 
+    readonly property string reconnectingResponse: "Status: Reconnecting
+Current server: aa123.example.com
+Country: Nation Land
+City: Place Town
+Your new IP: 123.45.67.89
+Current technology: OpenVPN
+Current protocol: UDP
+Transfer: 1.23 MiB received, 456.78 KiB sent
+Uptime: 43 minutes 21 seconds
+"
+
     readonly property string disconnectedResponse: "Status: Disconnected"
     
     readonly property string noInternetResponse: "Please check your internet connection and try again."
     
     readonly property var connectedObj: ({
             connected: true,
+            server: "aa123.example.com",
+            country: "Nation Land",
+            city: "Place Town",
+            ip: "123.45.67.89",
+            technology: "OpenVPN",
+            protocol: "UDP"
+        });
+    
+    readonly property var reconnectingObj: ({
+            connected: false,
             server: "aa123.example.com",
             country: "Nation Land",
             city: "Place Town",
@@ -79,6 +100,11 @@ Uptime: 43 minutes 21 seconds
                 expected: connectedObj
             },
             {
+                tag: "reconnecting", 
+                input: reconnectingResponse,
+                expected: reconnectingObj
+            },
+            {
                 tag: "disconnected", 
                 input: disconnectedResponse,
                 expected: disconnectedObj
@@ -107,6 +133,11 @@ Uptime: 43 minutes 21 seconds
 Country: Nation Land
 Server: aa123.example.com
 Your IP: 123.45.67.89"
+            },
+            {
+                tag: "connected",
+                input: reconnectingObj,
+                expected: "Not connected"
             },
             {
                 tag: "not connected",
