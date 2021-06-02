@@ -21,7 +21,9 @@ function parseStatusString(statusString) {
     }
 
     function parseIPAddress(statusString) {
-        return parseStringProperty(statusString, 'Your new IP');
+        let yourIP = parseStringProperty(statusString, 'Your new IP');
+        let serverIP = parseStringProperty(statusString, 'Server IP');
+        return serverIP ? serverIP : yourIP;
     }
 
     function parseTechnology(statusString) {

@@ -31,7 +31,7 @@ Status: Connected
 Current server: aa123.example.com
 Country: Nation Land
 City: Place Town
-Your new IP: 123.45.67.89
+Server IP: 123.45.67.89
 Current technology: OpenVPN
 Current protocol: UDP
 Transfer: 1.23 MiB received, 456.78 KiB sent
