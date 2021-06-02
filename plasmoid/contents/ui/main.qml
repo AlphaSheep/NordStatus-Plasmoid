@@ -9,6 +9,7 @@ import org.kde.plasma.components 2.0 as PlasmaComponents
 import org.kde.plasma.plasmoid 2.0
 
 import '../code/nordstatus.js' as NordStatus
+import '../code/flags.js' as Flags
 
 Item {
     
@@ -39,8 +40,6 @@ Item {
             width: Math.round(parent.width * 0.9)
             height: width
             source: plasmoid.file('', 'icons/nordvpn.svg')
-            
-
         }
         
         ColorOverlay {
@@ -49,6 +48,15 @@ Item {
             color: dataModel.status.connected ? theme.textColor : theme.negativeTextColor
         }
         
+        Image {
+            id: flagIcon
+            visible: dataModel.status.connected && Flags.get2LetterCode(dataModel.status.country)
+            source: "../icons/flags/png/" + Flags.get2LetterCode(dataModel.status.country) + ".png"
+            width: 16
+            height: 11
+            x: nordvpnIcon.width - width
+            y: nordvpnIcon.height - height
+        }
        
     }
         
