@@ -9,31 +9,32 @@ import org.kde.plasma.components 2.0 as PlasmaComponents
 import org.kde.plasma.plasmoid 2.0
 
 import '../code/nordstatus.js' as NordStatus
-import '../code/flags.js' as Flags
 
 Item {
-    
+
     QtObject {
         id: dataModel
         property var status: ({
             connected: false,
-            server: "",
             country: "",
+            countrycode: "",
             city: "",
+            isp: "",
+            server: "",
             ip: "",
-            technology: "",
-            protocol: ""
-        })        
+            coordinates: "",
+            error: "",
+        })
     }
-        
+
     // Always display the compact view.
     // Never show the full popup view even if there is space for it.
     Plasmoid.preferredRepresentation: Plasmoid.compactRepresentation
 
     Plasmoid.toolTipMainText: i18n("NordVPN Status");
     Plasmoid.toolTipSubText: NordStatus.getConnectionShortSummary(dataModel.status)
-            
-    Plasmoid.compactRepresentation: Item {        
+
+    Plasmoid.compactRepresentation: Item {
         PlasmaCore.IconItem {
             id: nordvpnIcon
             anchors.centerIn: parent
@@ -41,25 +42,25 @@ Item {
             height: width
             source: plasmoid.file('', 'icons/nordvpn.svg')
         }
-        
+
         ColorOverlay {
             anchors.fill: nordvpnIcon
             source: nordvpnIcon
             color: dataModel.status.connected ? theme.textColor : theme.negativeTextColor
         }
-        
+
         Image {
             id: flagIcon
-            visible: dataModel.status.connected && Flags.get2LetterCode(dataModel.status.country)
-            source: "../icons/flags/png/" + Flags.get2LetterCode(dataModel.status.country) + ".png"
+            visible: dataModel.status.connected
+            source: "../icons/flags/png/" + dataModel.status.countrycode + ".png"
             width: 16
             height: 11
             x: nordvpnIcon.width - width
             y: nordvpnIcon.height - height
         }
-       
+
     }
-        
+
     PlasmaCore.DataSource {
         id: executable
         engine: "executable"
@@ -71,7 +72,7 @@ Item {
             var stderr = data["stderr"]
             dataModel.status = NordStatus.parseStatusString(stdout)
         }
-        
-        interval: 2000
+
+        interval: 12 * 1000
     }
 }

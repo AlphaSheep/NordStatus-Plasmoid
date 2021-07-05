@@ -1,71 +1,60 @@
-
-var nordStatusCommand = 'nordvpn status';
+var nordStatusCommand = 'curl https://nordvpn.com//wp-admin/admin-ajax.php?action=get_user_info_data';
 
 function parseStatusString(statusString) {
-    
-    function parseIsConnected(statusString) {
-        let status = statusString.match(/Status: (\w+)/);
-        return (status !== null) && (status[1] === "Connected")
+
+    let parsedStatus = {};
+
+    let error = null;
+    try{
+        parsedStatus = JSON.parse(statusString);
+    } catch(SyntaxError){
+        error = "Failed to parse response from nordvpn.com";
     }
 
-    function parseServer(statusString) {
-        return parseStringProperty(statusString, 'Current server');
-    }
-
-    function parseCountry(statusString) {
-        return parseStringProperty(statusString, 'Country');
-    }
-
-    function parseCity(statusString) {
-        return parseStringProperty(statusString, 'City');
-    }
-
-    function parseIPAddress(statusString) {
-        let yourIP = parseStringProperty(statusString, 'Your new IP');
-        let serverIP = parseStringProperty(statusString, 'Server IP');
-        return serverIP ? serverIP : yourIP;
-    }
-
-    function parseTechnology(statusString) {
-        return parseStringProperty(statusString, 'Current technology');
-    }
-
-    function parseProtocol(statusString) {
-        return parseStringProperty(statusString, 'Current protocol');
-    }
-
-    function parseStringProperty(statusString, propertyName) {
-        let pattern = new RegExp(propertyName + ': ([\\w\\d\\.\\ ]+)')    
-        let value = statusString.match(pattern);
-        // value will be null if not in statusString (e.g. when disconnected), so have to check for this and return empty string instead
-        return value ? value[1] : ""; 
-    }
+    let status_ = parsedStatus['status'];
+    status_ = status_ == undefined ? false : status_;
 
     return {
-        connected: parseIsConnected(statusString),
-        server: parseServer(statusString),
-        country: parseCountry(statusString),
-        city: parseCity(statusString),
-        ip: parseIPAddress(statusString),
-        technology: parseTechnology(statusString),
-        protocol: parseProtocol(statusString)
+        connected: status_,
+        country: parsedStatus['country'],
+        countrycode: parsedStatus['country_code'] ? parsedStatus['country_code'].toLowerCase() : "",
+        city: parsedStatus['city'],
+        isp: parsedStatus['isp'],
+        server: parsedStatus['host'] ? parsedStatus['host']['domain'] : undefined,
+        ip: parsedStatus['ip'],
+        coordinates: parsedStatus['coordinates'],
+        error: error
     };
-    
+
 }
 
-
 function getConnectionShortSummary(conn) {
-    if (conn.connected) {
-        let result = [
-            i18n("Connected"), "\n", 
-            i18n("Country: "), conn.country, "\n",
-            i18n("Server: "), conn.server, "\n",
-            i18n("Your IP: "), conn.ip];
- 
-        return result.join('');
-        
+    let result = [
+        i18n(conn.connected ? "Connected" : "Not connected"),
+    ]
+    if(conn.country){
+        result = result.concat(["\n", i18n("Country: "), conn.country]);
     }
-    else {
-        return i18n("Not connected");
+    if(conn.city){
+        result = result.concat(["\n", i18n("City: "), conn.city]);
     }
+    if(conn.isp){
+        result = result.concat(["\n", i18n("ISP: "), conn.isp]);
+    }
+    if(conn.server){
+        result = result.concat(["\n", i18n("Server: "), conn.server]);
+    }
+    if(conn.ip){
+        result = result.concat(["\n", i18n("IP: "), conn.ip]);
+    }
+    if(conn.coordinates){
+        result = result.concat([
+            "\n", i18n("Coordinates: "), conn.coordinates['latitude'], i18n(", "), conn.coordinates['longitude']
+        ]);
+    }
+    if(conn.error){
+        result = result.concat(["\n", i18n("Error: "), conn.error]);
+    }
+
+    return result.join('');
 }

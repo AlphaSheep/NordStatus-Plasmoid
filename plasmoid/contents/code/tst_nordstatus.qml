@@ -16,133 +16,108 @@ TestCase {
         return input
     }
     
-    readonly property string connectedResponse: "Status: Connected
-Current server: aa123.example.com
-Country: Nation Land
-City: Place Town
-Your new IP: 123.45.67.89
-Current technology: OpenVPN
-Current protocol: UDP
-Transfer: 1.23 MiB received, 456.78 KiB sent
-Uptime: 43 minutes 21 seconds
-"
-    readonly property string connectedNeedUpdateResponse: "A new version of NordVPN is available! Please update the application.
-Status: Connected
-Current server: aa123.example.com
-Country: Nation Land
-City: Place Town
-Server IP: 123.45.67.89
-Current technology: OpenVPN
-Current protocol: UDP
-Transfer: 1.23 MiB received, 456.78 KiB sent
-Uptime: 43 minutes 21 seconds
-"
+    readonly property string connectedResponse: '{"coordinates":{"latitude":1.1,"longitude":2.2},"ip":"1.1.1.1","isp":"Co Ltd","host":{"ip_address":"1.1.1.1"},"status":true,"country":"England","region":"Region","city":"City","location":"Country, Region, City","area_code":"1234","country_code":"EN"}'
 
-    readonly property string reconnectingResponse: "Status: Reconnecting
-Current server: aa123.example.com
-Country: Nation Land
-City: Place Town
-Your new IP: 123.45.67.89
-Current technology: OpenVPN
-Current protocol: UDP
-Transfer: 1.23 MiB received, 456.78 KiB sent
-Uptime: 43 minutes 21 seconds
-"
+    readonly property string notConnectedResponse: '{"coordinates":{"latitude":2.2,"longitude":1.1},"ip":"1.2.3.4","isp":"ISP Ltd","host":{"domain":"example.com","ip_address":"1.2.3.4"},"status":false,"country":"Netherlands","region":"Region","city":"City","location":"Country, Region, City","area_code":"4321","country_code":"NL"}'
 
-    readonly property string disconnectedResponse: "Status: Disconnected"
-    
-    readonly property string noInternetResponse: "Please check your internet connection and try again."
-    
+    readonly property string malformedResponse: '{"coordinates":{"latitude":2.2,"longitude":1.1},"i'
+
     readonly property var connectedObj: ({
             connected: true,
-            server: "aa123.example.com",
-            country: "Nation Land",
-            city: "Place Town",
-            ip: "123.45.67.89",
-            technology: "OpenVPN",
-            protocol: "UDP"
+            country: "England",
+            countrycode: "en",
+            city: "City",
+            isp: "Co Ltd",
+            server: undefined,
+            ip: "1.1.1.1",
+            coordinates: {"latitude":1.1,"longitude":2.2},
+            error: null
         });
-    
-    readonly property var reconnectingObj: ({
+
+    readonly property var notConnectedObj: ({
             connected: false,
-            server: "aa123.example.com",
-            country: "Nation Land",
-            city: "Place Town",
-            ip: "123.45.67.89",
-            technology: "OpenVPN",
-            protocol: "UDP"
+            country: "Netherlands",
+            countrycode: "nl",
+            city: "City",
+            isp: "ISP Ltd",
+            server: "example.com",
+            ip: "1.2.3.4",
+            coordinates: {"latitude":2.2,"longitude":1.1},
+            error: null
         });
-    
-    readonly property var disconnectedObj: ({
+
+    readonly property var malformedObj: ({
             connected: false,
-            server: "",
-            country: "",
-            city: "",
-            ip: "",
-            technology: "",
-            protocol: ""
+            country: undefined,
+            countrycode: "",
+            city: undefined,
+            isp: undefined,
+            server: undefined,
+            ip: undefined,
+            coordinates: undefined,
+            error: "Failed to parse response from nordvpn.com"
         });
-    
+
+
     /*
      Test Cases
      */
-    
+
     function test_parseResponse_data() {
         return [
             {
-                tag: "connected", 
+                tag: "connected",
                 input: connectedResponse,
                 expected: connectedObj
             },
             {
-                tag: "connected and needs update", 
-                input: connectedNeedUpdateResponse,
-                expected: connectedObj
+                tag: "not connected",
+                input: notConnectedResponse,
+                expected: notConnectedObj
             },
             {
-                tag: "reconnecting", 
-                input: reconnectingResponse,
-                expected: reconnectingObj
-            },
-            {
-                tag: "disconnected", 
-                input: disconnectedResponse,
-                expected: disconnectedObj
-            },
-            {
-                tag: "no internet", 
-                input: noInternetResponse,
-                expected: disconnectedObj
+                tag: "malformed",
+                input: malformedResponse,
+                expected: malformedObj
             }
         ]
     }
-    
-    function test_parseResponse(data) {        
+
+    function test_parseResponse(data) {
         let actual = Logic.parseStatusString(data.input);
         let expected = data.expected;
         compare(actual, expected, data.tag)
     }
-    
-    
+
+
     function test_getConnectionShortSummary_data() {
         return [
             {
                 tag: "connected",
                 input: connectedObj,
                 expected: "Connected
-Country: Nation Land
-Server: aa123.example.com
-Your IP: 123.45.67.89"
-            },
-            {
-                tag: "connected",
-                input: reconnectingObj,
-                expected: "Not connected"
+Country: England
+City: City
+ISP: Co Ltd
+IP: 1.1.1.1
+Coordinates: 1.1, 2.2"
             },
             {
                 tag: "not connected",
-                input: disconnectedObj,
-                expected: "Not connected"
+                input: notConnectedObj,
+                expected: "Not connected
+Country: Netherlands
+City: City
+ISP: ISP Ltd
+Server: example.com
+IP: 1.2.3.4
+Coordinates: 2.2, 1.1"
+            },
+            {
+                tag: "malformed",
+                input: malformedObj,
+                expected: "Not connected
+Error: Failed to parse response from nordvpn.com"
             }
         ]
     }
